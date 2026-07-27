@@ -46,32 +46,37 @@ async function main() {
   console.log("🚀  REAL-TIME DATABASE CDC ORDER ENGINE — BOOT SEQUENCE INITIATED");
   console.log("────────────────────────────────────────────────────────────────");
 
-  console.log("⚙️    [1/4] Initialising embedded PostgreSQL cluster …");
-
-  const databaseDir = path.join(__dirname, ".pg-data");
-  const embeddedPg = new EmbeddedPostgres({
-    databaseDir: databaseDir,
-    user:        "postgres",
-    password:    "password",
-    port:        54321,
-    persistent:  true,
-  });
-
-  const isAlreadyInitialised = fs.existsSync(path.join(databaseDir, "PG_VERSION"));
-
-  if (!isAlreadyInitialised) {
-    console.log("⚙️    No existing data cluster found. Initialising fresh repository...");
-    await embeddedPg.initialise();
-  } else {
-    console.log("🔄   Existing database cluster detected. Bypassing redundant initialisation sequence.");
-  }
-
-  await embeddedPg.start();
-  console.log("✅  Embedded PostgreSQL started on port 54321");
-
   const DATABASE_URL =
     process.env.DATABASE_URL ||
     `postgresql://postgres:password@localhost:54321/postgres`;
+
+  let embeddedPg = null;
+
+  if (!process.env.DATABASE_URL) {
+    console.log("⚙️    [1/4] Initialising embedded PostgreSQL cluster …");
+    const databaseDir = path.join(__dirname, ".pg-data");
+    embeddedPg = new EmbeddedPostgres({
+      databaseDir: databaseDir,
+      user:        "postgres",
+      password:    "password",
+      port:        54321,
+      persistent:  true,
+    });
+
+    const isAlreadyInitialised = fs.existsSync(path.join(databaseDir, "PG_VERSION"));
+
+    if (!isAlreadyInitialised) {
+      console.log("⚙️    No existing data cluster found. Initialising fresh repository...");
+      await embeddedPg.initialise();
+    } else {
+      console.log("🔄   Existing database cluster detected. Bypassing redundant initialisation sequence.");
+    }
+
+    await embeddedPg.start();
+    console.log("✅  Embedded PostgreSQL started on port 54321");
+  } else {
+    console.log("⚙️    [1/4] External DATABASE_URL detected. Bypassing embedded PostgreSQL cluster start.");
+  }
 
   console.log(`⚙️    [2/4] Active connection string resolved → ${DATABASE_URL}`);
   console.log("⚙️    [3/4] Applying schema via init.sql …");
