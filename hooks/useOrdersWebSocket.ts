@@ -58,34 +58,27 @@ export function useOrdersWebSocket() {
         const eventTime = payload.timestamp || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
         if (payload.type === "snapshot") {
-          const snapshotOrders = (payload.orders || []) as Order[];
-          setOrders(snapshotOrders);
+          setOrders([]);
           setLoading(false);
           loadingRef.current = false;
-
-          const snapMetrics = {
-            total: snapshotOrders.length,
-            pending: snapshotOrders.filter((o) => o.status === "pending").length,
-            shipped: snapshotOrders.filter((o) => o.status === "shipped").length,
-            delivered: snapshotOrders.filter((o) => o.status === "delivered").length,
-          };
+          setEventCount(0);
 
           const pastTime = new Date(Date.now() - 5000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
           setChartHistory([
             {
               time: pastTime,
-              "Total Orders": snapMetrics.total,
-              "Pending Pool": snapMetrics.pending,
-              "In Transit": snapMetrics.shipped,
-              "Delivered Ledger": snapMetrics.delivered,
+              "Total Orders": 0,
+              "Pending Pool": 0,
+              "In Transit": 0,
+              "Delivered Ledger": 0,
             },
             {
               time: eventTime,
-              "Total Orders": snapMetrics.total,
-              "Pending Pool": snapMetrics.pending,
-              "In Transit": snapMetrics.shipped,
-              "Delivered Ledger": snapMetrics.delivered,
+              "Total Orders": 0,
+              "Pending Pool": 0,
+              "In Transit": 0,
+              "Delivered Ledger": 0,
             }
           ]);
           return;
