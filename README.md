@@ -20,6 +20,14 @@ This application demonstrates a zero-polling, highly reactive system architectur
 
 ---
 
+## 📸 Dashboard Interface Showcase
+
+![3-Column Command Center Dashboard Preview](./public/dashboard-preview.jpg)
+
+*Black & Crimson Red 3-Column Command Center Dashboard featuring real-time event tracking, interactive status filters, live order grid, analytics line chart, and autonomous audit console.*
+
+---
+
 ## 📐 System Architecture
 
 ```
