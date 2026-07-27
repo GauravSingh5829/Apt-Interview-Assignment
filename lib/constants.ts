@@ -6,14 +6,22 @@ export const STATUS_COLORS: Record<Order["status"], string> = {
   delivered: "bg-emerald-950/40 text-emerald-400 border border-emerald-800/50 shadow-xs",
 };
 
-const LOCAL_WS_URL = "ws://localhost:8080/ws";
+function formatWsUrl(rawUrl?: string): string {
+  if (!rawUrl) return LOCAL_WS_URL;
+  let formatted = rawUrl.trim();
+  if (formatted.startsWith("https://")) {
+    formatted = formatted.replace("https://", "wss://");
+  } else if (formatted.startsWith("http://")) {
+    formatted = formatted.replace("http://", "ws://");
+  } else if (!formatted.startsWith("ws://") && !formatted.startsWith("wss://")) {
+    formatted = `wss://${formatted}`;
+  }
+  if (!formatted.endsWith("/ws")) {
+    formatted = `${formatted.replace(/\/$/, "")}/ws`;
+  }
+  return formatted;
+}
 
-const isLocalBrowser =
-  typeof window !== "undefined" &&
-  ["localhost", "127.0.0.1"].includes(window.location.hostname);
-
-export const WS_URL = isLocalBrowser
-  ? LOCAL_WS_URL
-  : process.env.NEXT_PUBLIC_WS_URL || LOCAL_WS_URL;
+export const WS_URL = formatWsUrl(process.env.NEXT_PUBLIC_WS_URL);
 
 export const TOAST_DISCONNECT_ID = "ws-disconnect-alert-id";

@@ -1,5 +1,6 @@
 import EmbeddedPostgres from "embedded-postgres";
 import { WebSocketServer, WebSocket } from "ws";
+import http from "http";
 import pg from "pg";
 import fs from "fs";
 import path from "path";
@@ -172,10 +173,17 @@ async function main() {
 
   await startListenClient();
 
-  const wss = new WebSocketServer({ port: Number(PORT), path: "/ws" });
+  const server = http.createServer((req, res) => {
+    res.writeHead(200, { "Content-Type": "text/plain" });
+    res.end("Apt Interview Assignment CDC WebSocket Backend Running");
+  });
 
-  console.log(`\n🌐  [WSS] WebSocket server bound — ws://localhost:${PORT}/ws`);
-  console.log("────────────────────────────────────────────────────────────────\n");
+  const wss = new WebSocketServer({ server, path: "/ws" });
+
+  server.listen(Number(PORT), () => {
+    console.log(`\n🌐  [WSS] HTTP & WebSocket server bound — http://localhost:${PORT} & ws://localhost:${PORT}/ws`);
+    console.log("────────────────────────────────────────────────────────────────\n");
+  });
 
   wss.on("connection", async (ws, req) => {
     const clientIp = req.socket.remoteAddress || "unknown";
@@ -184,7 +192,7 @@ async function main() {
     connections.add(ws);
 
     try {
-      const result = await pool.query("SELECT * FROM orders ORDER BY id ASC;");
+      const result = await pool.query("SELECT * FROM (SELECT * FROM orders ORDER BY id DESC LIMIT 100) sub ORDER BY id ASC;");
       if (ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({ type: "snapshot", orders: result.rows }));
         console.log(`📦  [WSS] Snapshot delivered to ${clientIp}: ${result.rows.length} orders`);
