@@ -1,0 +1,43 @@
+{
+  "name": "apt-interview-assignment",
+  "version": "0.1.0",
+  "description": "Real-time database change propagation to connected clients via WebSockets and DB Triggers (CDC)",
+  "author": "Gaurav Kumar Singh",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "dev:all": "concurrently \"npm run dev\" \"node simulator.js\"",
+    "dev:reset": "concurrently \"npm run dev\" \"node simulator.js --reset\"",
+    "db:reset": "node simulator.js --reset",
+    "db:init": "psql $DATABASE_URL -f init.sql"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.105.4",
+    "dotenv": "^17.4.2",
+    "embedded-postgres": "^18.3.0-beta.17",
+    "lucide-react": "^1.16.0",
+    "next": "16.2.6",
+    "pg": "^8.21.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "recharts": "^3.8.1",
+    "sonner": "^2.0.7",
+    "ws": "^8.20.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/ws": "^8.18.1",
+    "concurrently": "^9.2.1",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
